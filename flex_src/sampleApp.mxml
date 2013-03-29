@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="init(event)" xmlns:business="business.*" xmlns:controller="controller.*">
+	
+	<!--
+	<mx:RemoteObject id="employeeService" result="success(event)" fault="fault(event)" destination="employeeService" endpoint="http://localhost:8080/sampleApp/messagebroker/amf">
+	</mx:RemoteObject>
+	-->
+	
+	<business:Services>
+		
+	</business:Services>
+		
+	<controller:FSController>
+		
+	</controller:FSController>
+		
+	<mx:Script>
+		<![CDATA[
+			import com.adobe.cairngorm.control.CairngormEventDispatcher;
+			import mx.controls.Alert;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.collections.ArrayCollection;
+			import model.EmployeesModelLocator;
+			import event.LoadEmployeesEvent;
+			
+			
+			[Bindable]
+			internal var employeeList:ArrayCollection;
+			
+			internal function  success(event:ResultEvent):void{
+				//employeeList=event.result as ArrayCollection;
+			}
+			
+			
+			internal function  fault(event:FaultEvent):void{
+				//Alert.show(event.fault.message,"失败了");
+			}
+			
+			internal function  init(event:Event):void{
+				//employeeService.getList();
+				
+				var loadEmployeesEvent:LoadEmployeesEvent=new LoadEmployeesEvent();
+				//loadEmployeesEvent.dispatch();
+				CairngormEventDispatcher.getInstance().dispatchEvent(loadEmployeesEvent);
+				
+			}
+			
+			
+		]]>
+	</mx:Script>
+	
+
+
+	<mx:DataGrid x="166" y="82" dataProvider="{EmployeesModelLocator.getInstance().employeeList}">
+		<mx:columns>
+			<mx:DataGridColumn headerText="Name" dataField="name"/>
+			<mx:DataGridColumn headerText="Age" dataField="age"/>
+			<mx:DataGridColumn headerText="Email" dataField="email"/>
+		</mx:columns>
+	</mx:DataGrid>
+	
+</mx:Application>

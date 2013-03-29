@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service" 
+    class="flex.messaging.services.RemotingService">
+
+    <adapters>
+        <adapter-definition id="java-object" class="flex.messaging.services.remoting.adapters.JavaAdapter" default="true"/>
+    </adapters>
+
+    <default-channels>
+        <channel ref="my-amf"/>
+    </default-channels>
+	
+	<!--  
+	使用普通JavaBean时候的配置
+	<destination id="employeeServiceDest">
+		<properties>
+			<source>com.sample.service.EmployeeService</source>
+		</properties>
+	</destination>
+	-->
+	
+	<!-- 使用Spring时候的配置 -->
+	<!--  
+	<destination id="employeeServiceDest">
+		<properties>
+			<factory>springFactory</factory>
+			<source>employeeService</source>
+		</properties>
+	</destination>
+	-->
+	
+</service>

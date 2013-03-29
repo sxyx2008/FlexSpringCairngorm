@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:flex="http://www.springframework.org/schema/flex"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/flex
+       	http://www.springframework.org/schema/flex/spring-flex-1.0.xsd
+       	http://www.springframework.org/schema/aop 
+       	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+ 		http://www.springframework.org/schema/tx
+       	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	
+	<flex:message-broker></flex:message-broker>
+	
+	
+	<bean id="dataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource">
+		<property name="alias">
+			<value>dbname</value>
+		</property>
+		<property name="minimumConnectionCount">
+			<value>10</value>
+		</property>
+		<property name="maximumConnectionCount">
+			<value>100</value>
+		</property>
+		<property name="prototypeCount">
+			<value>5</value>
+		</property>
+	</bean>
+	
+	
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="/WEB-INF/sqlmap-config.xml"></property>
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<bean id="employeeDao" class="com.sample.dao.ibatis.EmployeeDaoImpl">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+	
+	<bean id="employeeService" class="com.sample.service.EmployeeServiceImpl">
+		<property name="employeeDao" ref="employeeDao"></property>
+		<flex:remoting-destination/>
+	</bean>
+	
+	
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="instert*"/>
+			<tx:method name="update*"/>
+			<tx:method name="delete*"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut expression="execution(* com.sample.service..*.*(..))" id="serviceOperation"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceOperation"/>
+	</aop:config>
+	
+	
+	
+	
+	<!--  
+	<context:annotation-config></context:annotation-config>
+	<context:component-scan base-package="com.sample.service"></context:component-scan>
+	-->
+	
+</beans>
